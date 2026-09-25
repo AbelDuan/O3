@@ -38,10 +38,19 @@ cp "$SRC/cve64560-src/profile_lhasa18_draft.json" "$DST/exploit-src/" 2>/dev/nul
 find "$DST" -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
 
 cd "$DST"
-echo "=== secret scan (must all be 0) ==="
+echo "=== secret scan (must all be 0; this script excludes itself) ==="
+LEAK=0
 for pat in "github_pat_" "080808" "02040860499C3540" "192\.168\."; do
-  printf "  %-20s %s\n" "$pat" "$(grep -ral "$pat" . --exclude-dir=.git 2>/dev/null | wc -l)"
+  # --exclude this script: it contains the patterns as literals (self-match)
+  # `|| true`: grep exits 1 on no-match, which would trip `set -e`
+  hits=$( { grep -ral "$pat" . --exclude-dir=.git --exclude="$(basename "$0")" 2>/dev/null || true; } | wc -l)
+  printf "  %-20s %s\n" "$pat" "$hits"
+  [ "$hits" != "0" ] && LEAK=1
 done
+if [ "$LEAK" != "0" ]; then
+  echo "ABORT: 检测到疑似敏感内容，已拒绝推送。请先处理上面的文件。"
+  exit 1
+fi
 
 git add -A
 if git diff --cached --quiet; then
