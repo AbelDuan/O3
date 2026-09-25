@@ -1,0 +1,23 @@
+# 设备取证转储 / 二进制：体积以 GB 计，且含个人设备数据（账号、应用列表、
+# WiFi SSID、tombstone、完整日志、设备序列号）。绝不入库。
+*.zip
+*.tar.gz
+*.apk
+*.idsig
+*.img
+*.raw
+*.db
+bugreport/
+evidence*/
+minidump*
+systemmap*.txt
+kernel_Image*
+pstore.log
+kernel.log
+mdr.bin
+*.zstd
+session.jsonl
+transcript*.txt
+__pycache__/
+*.pyc
+*.bak
