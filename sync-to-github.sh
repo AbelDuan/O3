@@ -25,6 +25,29 @@ for f in analyze-log.py nvd_scan.py refine.py hold-auth.py pair-by-code.sh \
   [ -f "$SRC/cve-hunt/$f" ] && sanitize < "$SRC/cve-hunt/$f" > "$DST/tools/$f"
 done
 
+# ---- 2026-09-26 阶段性胜利：SELinux 副作用根治（v6 实机跑通）----
+# 本会话新增的取证 / 验证 / 持久化工具
+for f in watch-live.sh damage-timeline.sh post-run-verify.sh \
+         grab-root-and-patch.sh push-sel5-online.sh; do
+  [ -f "$SRC/cve-hunt/$f" ] && sanitize < "$SRC/cve-hunt/$f" > "$DST/tools/$f"
+done
+
+# APK 补丁构建脚本（只放脚本；APK 本体见 .gitignore）
+mkdir -p "$DST/apk-patch"
+for f in build_sel4.py build_sel5.py build_sel6.py build_selinux_fix.py \
+         build_attempt1v2.py repack.py; do
+  [ -f "$SRC/ennea-repack/work/$f" ] && sanitize < "$SRC/ennea-repack/work/$f" > "$DST/apk-patch/$f"
+done
+
+# 存储丢失 / 「储存损坏」只读取证报告
+[ -f "$SRC/cve-hunt/evidence-live/storage-loss-forensics-20260926.md" ] && \
+  sanitize < "$SRC/cve-hunt/evidence-live/storage-loss-forensics-20260926.md" \
+    > "$DST/docs/storage-loss-forensics.md" || true
+
+# 内核 15 与 18 的符号漂移对比报告
+[ -f "$SRC/lhasa-rom18/kernel-diff-15-vs-18.md" ] && \
+  sanitize < "$SRC/lhasa-rom18/kernel-diff-15-vs-18.md" > "$DST/docs/kernel-diff-15-vs-18.md" || true
+
 # TDD guards
 for f in test_gate_buffer.py test_ksud_official.py test_pipe_count.py test_repeats_env.py; do
   [ -f "$SRC/cve-hunt/$f" ] && cp "$SRC/cve-hunt/$f" "$DST/tests/$f"
